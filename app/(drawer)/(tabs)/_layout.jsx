@@ -30,15 +30,7 @@ export default function TabLayout() {
           }}
         />
 
-        <Tabs.Screen
-          name="pndTask"
-          options={{
-            title: "PND",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="time-outline" size={size} color={color} />
-            ),
-          }}
-        />
+  
         <Tabs.Screen
           name="chats"
           options={{

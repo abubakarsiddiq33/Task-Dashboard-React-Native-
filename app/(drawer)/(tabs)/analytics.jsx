@@ -12,9 +12,9 @@ export default function Analytics  () {
   return (
     <>
 
-      <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.container}>
-
+ <Text style={styles.header}>Analytics</Text>
           <View style={styles.card}>
             <Text style={styles.cardNum}>0</Text>
             <Text style={styles.cardLabel}>Total Tasks</Text>
@@ -55,7 +55,7 @@ export default function Analytics  () {
             <Text style={styles.cardLabel}>Day Streak</Text>
           </View>
         </ScrollView>
-      </SafeAreaView>
+      </View>
     </>
   );
 };
@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     padding: 15,
     gap: 20,
   },
+   header: { fontSize: 22, fontWeight: "bold", marginBottom: 16 },
   card: {
     backgroundColor: "white",
     borderRadius: 10,

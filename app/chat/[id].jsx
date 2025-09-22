@@ -1,8 +1,14 @@
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from "react-native";
-import { SafeAreaFrameContext } from "react-native-safe-area-context";
-import { SafeAreaView } from "react-native-web";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+  SafeAreaView,
+} from "react-native";
 
 export default function ChatDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -14,19 +20,29 @@ export default function ChatDetailScreen() {
 
   const sendMessage = () => {
     if (input.trim()) {
-      setMessages([...messages, { id: Date.now().toString(), text: input, sender: "me" }]);
+      setMessages([
+        ...messages,
+        { id: Date.now().toString(), text: input, sender: "me" },
+      ]);
       setInput("");
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Chat with User {id}</Text>
+    <View style={styles.container}>
+      <View>
+        <Text style={styles.header}>Chat with User {id}</Text>
+      </View>
       <FlatList
         data={messages}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={[styles.message, item.sender === "me" ? styles.me : styles.other]}>
+          <View
+            style={[
+              styles.message,
+              item.sender === "me" ? styles.me : styles.other,
+            ]}
+          >
             <Text style={styles.messageText}>{item.text}</Text>
           </View>
         )}
@@ -43,13 +59,13 @@ export default function ChatDetailScreen() {
           <Text style={{ color: "#fff", fontWeight: "bold" }}>Send</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f5f5f5" },
-  header: { fontSize: 18, fontWeight: "bold", margin: 12 },
+  container: { flex: 1, backgroundColor: "#f5f5f5",marginTop : 40 },
+  header: { fontSize: 18, fontWeight: "bold", margin: 12, textAlign: "center" },
   message: {
     padding: 10,
     margin: 8,
@@ -65,6 +81,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderTopWidth: 1,
     borderColor: "#eee",
+    marginBottom: 25
   },
   input: {
     flex: 1,
