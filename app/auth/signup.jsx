@@ -1,20 +1,33 @@
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { useDispatch } from "react-redux";
-import { signupUser } from "../../Redux/FeatureSlice/userSlice";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from "react-native";
+import { useSignupUserMutation } from "../../Redux/FeatureSlice/userSlice";
 
-export default function signup() {
-  const [name, setName] = useState("");
+export default function Signup() {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const dispatch = useDispatch();
 
-  const handleSignup = () => {
-    dispatch(signupUser({name, email, password }));
-    console.log("Signed up with:", { name });
-    router.push("/auth/login");
-    Alert.alert("Success", `Account created for ${name}! Please login.`);
+  const [signupUser, { isLoading, isError, error }] = useSignupUserMutation();
+
+  const handleSignup = async () => {
+    try {
+      const result = await signupUser({ username, email, password }).unwrap();
+      console.log("Signed up:", result);
+
+      Alert.alert("Success", `Account created for ${username}! Please login.`);
+      router.push("/auth/login");
+    } catch (err) {
+      console.error("Signup failed:", err);
+      Alert.alert("Error", err?.data?.message || "Signup failed!");
+    }
   };
 
   return (
@@ -24,10 +37,8 @@ export default function signup() {
       <TextInput
         style={styles.input}
         placeholder="Full Name"
-        value={name}
-
-
-        onChangeText={setName}
+        value={username}
+        onChangeText={setUsername}
       />
 
       <TextInput
@@ -46,21 +57,28 @@ export default function signup() {
         onChangeText={setPassword}
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleSignup}>
-        <Text style={styles.buttonText}>Sign Up</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleSignup}
+        disabled={isLoading}
+      >
+        <Text style={styles.buttonText}>
+          {isLoading ? "Signing up..." : "Sign Up"}
+        </Text>
       </TouchableOpacity>
 
+      {isError && (
+        <Text style={{ color: "red", marginTop: 10 }}>
+          {error?.data?.message || "Something went wrong"}
+        </Text>
+      )}
+
       <Text style={styles.loginText}>
-        Already have an account? <Text style={styles.link}>
+        Already have an account?{" "}
+        <Text style={styles.link}>
           <Link href="/auth/login">Login</Link>
         </Text>
       </Text>
-{/* {loading ? (
-        <ActivityIndicator />
-      ) : (
-        <Button title="Sign Up" onPress={handleSignup} />
-      )}
-      {error && <Text style={{ color: "red", marginTop: 10 }}>{error}</Text>} */}
     </View>
   );
 }
@@ -111,6 +129,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-
-
-

@@ -1,7 +1,7 @@
 import  Header  from "../components/Header";
 import { Stack } from "expo-router";
 import { Provider } from "react-redux";
-import store from "../Redux/store";
+import {store} from "../Redux/store";
 
 export default function RootLayout() {
   return (

@@ -8,28 +8,34 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../../Redux/FeatureSlice/userSlice";
+import { useLoginUserMutation } from "../../Redux/FeatureSlice/userSlice";
 
-export default function login() {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const dispatch = useDispatch();
 
+  const [loginUser, { isLoading, isError, error }] = useLoginUserMutation();
 
-
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (email === "" || password === "") {
       Alert.alert("Error", "Please enter email and password");
-    } else {
-      dispatch(loginUser({ email, password }));
-      router.push("/(drawer)");
-      console.log("Logged in with:", { email, password });
+      return;
+    }
 
-      // Alert.alert("Success", `Welcome ${email}!`);
+    try {
+      const result = await loginUser({ email, password }).unwrap();
+      console.log("Login Success:", result);
+
+      // agar API token bhejti hai to yahan save kar sakte ho (AsyncStorage/Redux me)
+      // AsyncStorage.setItem("token", result.token);
+
+      router.push("/(drawer)");
+      Alert.alert("Success", `Welcome ${result?.user?.name || email}!`);
+    } catch (err) {
+      console.error("Login failed:", err);
+      Alert.alert("Error", err?.data?.message || "Invalid email or password");
     }
   };
-
 
   return (
     <View style={styles.container}>
@@ -53,27 +59,33 @@ export default function login() {
         secureTextEntry
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleLogin}
+        disabled={isLoading}
+      >
+        <Text style={styles.buttonText}>
+          {isLoading ? "Logging in..." : "Login"}
+        </Text>
       </TouchableOpacity>
 
+      {isError && (
+        <Text style={{ color: "red", marginTop: 10 }}>
+          {error?.data?.message || "Login failed"}
+        </Text>
+      )}
+
       <Text style={styles.signupText}>
-        Don’t have an account?
+        Don’t have an account?{" "}
         <Text style={styles.link}>
           <Link href="/auth/signup" style={styles.link}>
-            SignUp
+            Sign Up
           </Link>
         </Text>
       </Text>
- {/* {loading ? (
-        <ActivityIndicator />
-      ) : (
-        <TouchableOpacity title="Login" onPress={handleLogin} />
-      )}
-      {error && <Text style={{ color: "red", marginTop: 10 }}>{error}</Text>} */}
     </View>
-  )};
-
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -121,6 +133,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-
-
-
