@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  FlatList,
-  SafeAreaView,
-} from "react-native";
+import { View, Text, Pressable, StyleSheet, FlatList } from "react-native";
 
 // Dummy data
 const navigationItems = [
@@ -26,26 +19,11 @@ export default function Menu() {
         onPress={() => setActiveTab(item.id)}
         style={[
           styles.item,
-          isActive ? styles.activeItem : styles.inactiveItem,
+        
         ]}
       >
         <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-          <Text
-            style={[
-              styles.icon,
-              isActive
-                ? { color: "#fff" }
-                : item.id === "important"
-                ? { color: "#facc15" } // yellow
-                : item.id === "today"
-                ? { color: "#22c55e" } // green
-                : item.id === "analytics"
-                ? { color: "#f97316" } // orange
-                : { color: "#374151" }, // gray
-            ]}
-          >
-            {item.icon}
-          </Text>
+          <Text style={[styles.icon]}>{item.icon}</Text>
           <Text
             style={[
               styles.title,
@@ -68,14 +46,14 @@ export default function Menu() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, marginTop: 20 }}>
+    <View style={{ flex: 1, marginTop: 20 }}>
       <FlatList
         data={navigationItems}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={{ paddingHorizontal: 20 }}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -91,16 +69,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   activeItem: {
-    backgroundColor: "#6366f1", // indigo
+    backgroundColor: "#6366f1",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
   },
-  inactiveItem: {
-    backgroundColor: "#f9fafb", // light gray
-  },
+ 
   icon: {
     fontSize: 18,
   },

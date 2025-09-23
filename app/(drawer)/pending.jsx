@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
@@ -8,9 +7,9 @@ import {
   View,
 } from "react-native";
 
-export default function HomeScreen() {
+export default function PendingTask() {
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <View style={styles.container}>
         {/* Task Card */}
         <View style={styles.card}>
@@ -55,7 +54,7 @@ export default function HomeScreen() {
 
         {/* Floating Plus Button */}
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

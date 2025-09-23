@@ -15,7 +15,8 @@ export default function DrawerLayout() {
       <Drawer
         screenOptions={{
           drawerStyle: {
-            backgroundColor: "#b7bbbeff",
+            backgroundColor: "#cdd2d6ff",
+            width: 250,
           },
           drawerActiveTintColor: "#eff7ffff",
           drawerActiveBackgroundColor: "#437c8d",
@@ -87,7 +88,6 @@ const styles = StyleSheet.create({
   logoutContainer: {
     padding: 20,
     borderColor: "#e0e0e0",
-    backgroundColor: "#b7bbbeff",
     marginBottom: 30,
   },
   logoutBtn: {

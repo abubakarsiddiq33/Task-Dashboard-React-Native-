@@ -1,5 +1,4 @@
 import {
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -81,7 +80,7 @@ const styles = StyleSheet.create({
     padding: 15,
     gap: 20,
   },
-   header: { fontSize: 22, fontWeight: "bold", marginBottom: 16 },
+   header: { fontSize: 22, fontWeight: "bold", marginBottom: 2, color: "#437c8d"},
   card: {
     backgroundColor: "white",
     borderRadius: 10,

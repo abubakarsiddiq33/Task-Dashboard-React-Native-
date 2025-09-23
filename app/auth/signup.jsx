@@ -1,19 +1,20 @@
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { useDispatch } from "react-redux";
+import { signupUser } from "../../Redux/FeatureSlice/userSlice";
 
 export default function signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
 
   const handleSignup = () => {
-    if (!name || !email || !password) {
-      Alert.alert("Error", "All fields are required");
-      return;
-    }
-    Alert.alert("Success", `Account created for ${name}`);
-    // 👉 yaha API call kar sakte ho (backend integration)
+    dispatch(signupUser({name, email, password }));
+    console.log("Signed up with:", { name });
+    router.push("/auth/login");
+    Alert.alert("Success", `Account created for ${name}! Please login.`);
   };
 
   return (
@@ -24,6 +25,8 @@ export default function signup() {
         style={styles.input}
         placeholder="Full Name"
         value={name}
+
+
         onChangeText={setName}
       />
 
@@ -52,6 +55,12 @@ export default function signup() {
           <Link href="/auth/login">Login</Link>
         </Text>
       </Text>
+{/* {loading ? (
+        <ActivityIndicator />
+      ) : (
+        <Button title="Sign Up" onPress={handleSignup} />
+      )}
+      {error && <Text style={{ color: "red", marginTop: 10 }}>{error}</Text>} */}
     </View>
   );
 }
@@ -102,3 +111,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
+
+

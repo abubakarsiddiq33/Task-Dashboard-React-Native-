@@ -1,5 +1,6 @@
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import { useSelector } from "react-redux";
 
 const chatList = [
   { id: "1", name: "Alice" },
@@ -9,6 +10,7 @@ const chatList = [
 
 export default function Chats() {
   const router = useRouter();
+
 
   return (
     <View style={styles.container}>
@@ -31,7 +33,7 @@ export default function Chats() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: "#f5f5f5" },
-  header: { fontSize: 22, fontWeight: "bold", marginBottom: 16 },
+  header: { fontSize: 22, fontWeight: "bold", marginBottom: 16, color: "#437c8d" },
   chatItem: {
     padding: 16,
     backgroundColor: "#fff",

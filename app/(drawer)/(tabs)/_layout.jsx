@@ -36,7 +36,7 @@ export default function TabLayout() {
           options={{
             title: "Chat",
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="checkmark-done" size={size} color={color} />
+              <Ionicons name="chatbox" size={size} color={color} />
             ),
           }}
         />

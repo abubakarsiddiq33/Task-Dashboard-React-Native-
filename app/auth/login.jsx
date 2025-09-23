@@ -8,23 +8,28 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../../Redux/FeatureSlice/userSlice";
 
 export default function login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
+
+
 
   const handleLogin = () => {
     if (email === "" || password === "") {
       Alert.alert("Error", "Please enter email and password");
-      router.push("/(drawer)");
-      console.log("Logged in with:", { email, password });
     } else {
+      dispatch(loginUser({ email, password }));
       router.push("/(drawer)");
       console.log("Logged in with:", { email, password });
+
       // Alert.alert("Success", `Welcome ${email}!`);
-      // yaha API call bhi kar sakte ho (fetch/axios)
     }
   };
+
 
   return (
     <View style={styles.container}>
@@ -43,9 +48,9 @@ export default function login() {
         style={styles.input}
         placeholder="Password"
         placeholderTextColor="#999"
-        secureTextEntry
         value={password}
         onChangeText={setPassword}
+        secureTextEntry
       />
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
@@ -60,9 +65,15 @@ export default function login() {
           </Link>
         </Text>
       </Text>
+ {/* {loading ? (
+        <ActivityIndicator />
+      ) : (
+        <TouchableOpacity title="Login" onPress={handleLogin} />
+      )}
+      {error && <Text style={{ color: "red", marginTop: 10 }}>{error}</Text>} */}
     </View>
-  );
-}
+  )};
+
 
 const styles = StyleSheet.create({
   container: {
@@ -110,3 +121,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
+
+

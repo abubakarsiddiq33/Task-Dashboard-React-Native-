@@ -1,13 +1,16 @@
 import { useState } from "react";
-import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import TaskModal from "../../../components/TaskModal";
+import { Provider, useSelector } from "react-redux";
+import store from "../../../Redux/store";
 
 export default function HomeScreen() {
   const [isChecked, setChecked] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+ 
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <View style={styles.container}>
         <TextInput
           placeholder="Search..."
@@ -71,7 +74,7 @@ export default function HomeScreen() {
         {/* Task Modal */}
         <TaskModal visible={modalVisible} onClose={() => setModalVisible(false)} />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
