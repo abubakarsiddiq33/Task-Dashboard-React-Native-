@@ -8,21 +8,26 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import { useSignupUserMutation } from "../../Redux/FeatureSlice/userSlice";
+import { useSignupUserMutation } from "../../Redux/FeatureSlice/authSlice";
 
 export default function Signup() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // RTK Query signup hook
   const [signupUser, { isLoading, isError, error }] = useSignupUserMutation();
 
   const handleSignup = async () => {
     try {
+      // backend ko call
       const result = await signupUser({ username, email, password }).unwrap();
       console.log("Signed up:", result);
 
+      // success alert
       Alert.alert("Success", `Account created for ${username}! Please login.`);
+
+      // login page par redirect
       router.push("/auth/login");
     } catch (err) {
       console.error("Signup failed:", err);

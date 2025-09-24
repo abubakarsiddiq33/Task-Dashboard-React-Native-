@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import {
   View,
@@ -6,67 +7,60 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Button,
+  Alert,
 } from "react-native";
+import { useCreateTaskMutation } from "../Redux/FeatureSlice/tasksApiSlice";
 
 export default function TaskModal({ visible, onClose }) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState("Normal");
+  const [category, setCategory] = useState("General");
+  const [dueDate, setDueDate] = useState("");
+  const [estimatedHours, setEstimatedHours] = useState("");
+  const [tagsInput, setTagsInput] = useState("");
+  const [assignedUser, setAssignedUser] = useState("");
+
+  const [createTask, { isLoading }] = useCreateTaskMutation();
+
+  const handleSave = async () => {
+    if (!title || !description) {
+      Alert.alert("Error", "Title aur Description required hain!");
+      return;
+    }
+
+    const newTask = {
+      title,
+      description,
+      priority,
+      category,
+      dueDate,
+      estimatedHours,
+      tags: tagsInput.split(",").map((tag) => tag.trim()),
+      assignedUser,
+    };
+
+    try {
+      await createTask(newTask).unwrap();
+      Alert.alert("Success", "Task created successfully!");
+      // reset fields
+      setTitle("");
+      setDescription("");
+      setPriority("Normal");
+      setCategory("General");
+      setDueDate("");
+      setEstimatedHours("");
+      setTagsInput("");
+      setAssignedUser("");
+
+      onClose(); // modal close
+    } catch (err) {
+      console.error("Task create error:", err);
+      Alert.alert("Error", err?.data?.message || "Task create failed!");
+    }
+  };
+
   return (
-    // <Modal
-    //   animationType="slide"
-    //   transparent={true}
-    //   visible={visible}
-    //   onRequestClose={onClose}
-    // >
-    //   <View style={styles.overlay}>
-    //     <View style={styles.modalContainer}>
-    //       <Text style={styles.heading}>Add Task</Text>
-
-    //       {/* Title */}
-    //       <TextInput
-    //         placeholder="Enter Title"
-    //         style={styles.input}
-    //         value={title}
-    //         onChangeText={setTitle}
-    //       />
-
-    //       {/* Description */}
-    //       <TextInput
-    //         placeholder="Enter Description"
-    //         style={styles.input}
-    //         value={description}
-    //         onChangeText={setDescription}
-    //         multiline
-    //       />
-
-    //       {/* Level */}
-    //       <TextInput
-    //         placeholder="Enter Level (Easy, Medium, Hard)"
-    //         style={styles.input}
-    //         value={level}
-    //         onChangeText={setLevel}
-    //       />
-
-    //       {/* Time */}
-    //       <TextInput
-    //         placeholder="Enter Time (e.g. 2h, 30m)"
-    //         style={styles.input}
-    //         value={time}
-    //         onChangeText={setTime}
-    //       />
-
-    //       {/* Buttons */}
-    //       <View style={styles.btnRow}>
-    //         <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
-    //           <Text style={styles.btnText}>Cancel</Text>
-    //         </TouchableOpacity>
-    //         <TouchableOpacity style={styles.saveBtn}>
-    //           <Text style={styles.btnText}>Save</Text>
-    //         </TouchableOpacity>
-    //       </View>
-    //     </View>
-    //   </View>
-    // </Modal>
-
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.modalOverlay}>
         <View style={styles.modalBox}>
@@ -75,22 +69,37 @@ export default function TaskModal({ visible, onClose }) {
           <TextInput
             style={styles.input}
             placeholder="Title"
-            // value={title}
+            value={title}
+            onChangeText={setTitle}
           />
 
           <TextInput
             style={styles.input}
             placeholder="Description"
-            // value={description}
-
+            value={description}
+            onChangeText={setDescription}
             multiline
           />
 
           <Text style={styles.label}>Priority:</Text>
           <View style={styles.priorityRow}>
             {["High", "Medium", "Low"].map((level) => (
-              <TouchableOpacity key={level} style={[styles.priorityBtn]}>
-                <Text style={[styles.priorityText]}>{level}</Text>
+              <TouchableOpacity
+                key={level}
+                style={[
+                  styles.priorityBtn,
+                  priority === level && styles.activePriority,
+                ]}
+                onPress={() => setPriority(level)}
+              >
+                <Text
+                  style={[
+                    styles.priorityText,
+                    priority === level && { color: "#fff" },
+                  ]}
+                >
+                  {level}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -98,102 +107,60 @@ export default function TaskModal({ visible, onClose }) {
           <TextInput
             style={styles.input}
             placeholder="Category"
-            // value={category}
+            value={category}
+            onChangeText={setCategory}
           />
 
           <TextInput
             style={styles.input}
             placeholder="Due Date (e.g. 2025-09-10)"
-            // value={dueDate}
+            value={dueDate}
+            onChangeText={setDueDate}
           />
 
           <TextInput
             style={styles.input}
             placeholder="Estimated Hours"
-            // value={estHours}
-
+            value={estimatedHours}
+            onChangeText={setEstimatedHours}
             keyboardType="numeric"
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Tags (comma separated)"
+            value={tagsInput}
+            onChangeText={setTagsInput}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Assign to (User ID / Name)"
+            value={assignedUser}
+            onChangeText={setAssignedUser}
           />
 
           <View style={styles.btnRow}>
             <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
               <Text style={styles.btnText}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.saveBtn}>
-              <Text style={styles.btnText}>Save</Text>
+            <TouchableOpacity
+              style={styles.saveBtn}
+              onPress={handleSave}
+              disabled={isLoading}
+            >
+              <Text style={styles.btnText}>
+                {isLoading ? "Saving..." : "Save"}
+              </Text>
             </TouchableOpacity>
           </View>
-         
         </View>
       </View>
     </Modal>
   );
 }
 
-// const styles = StyleSheet.create({
-//   overlay: {
-//     flex: 1,
-//     backgroundColor: "rgba(0,0,0,0.5)",
-//     justifyContent: "center",
-//     alignItems: "center",
-//   },
-//   modalContainer: {
-//     width: "90%",
-//     backgroundColor: "#fff",
-//     borderRadius: 12,
-//     padding: 20,
-//     elevation: 5,
-//   },
-//   heading: {
-//     fontSize: 20,
-//     fontWeight: "bold",
-//     marginBottom: 15,
-//     textAlign: "center",
-//   },
-//   input: {
-//     borderWidth: 1,
-//     borderColor: "#ccc",
-//     borderRadius: 8,
-//     padding: 10,
-//     marginBottom: 12,
-//   },
-//   btnRow: {
-//     flexDirection: "row",
-//     justifyContent: "space-between",
-//     marginTop: 10,
-//   },
-//   cancelBtn: {
-//     flex: 1,
-//     backgroundColor: "#999",
-//     padding: 12,
-//     borderRadius: 8,
-//     marginRight: 8,
-//   },
-//   saveBtn: {
-//     flex: 1,
-//     backgroundColor: "#437c8d",
-//     padding: 12,
-//     borderRadius: 8,
-//     marginLeft: 8,
-//   },
-//   btnText: {
-//     color: "#fff",
-//     fontWeight: "bold",
-//     textAlign: "center",
-//   },
-// });
-
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center" },
-  heading: { fontSize: 22, marginBottom: 20, fontWeight: "bold" },
-  resultBox: {
-    marginBottom: 20,
-    padding: 15,
-    borderWidth: 1,
-    borderRadius: 8,
-    borderColor: "#ccc",
-  },
-  resultText: { fontWeight: "bold", marginBottom: 5 },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
@@ -203,16 +170,23 @@ const styles = StyleSheet.create({
   modalBox: {
     width: "90%",
     backgroundColor: "#fff",
-    borderRadius: 10,
+    borderRadius: 15,
     padding: 20,
+    elevation: 10,
   },
-  modalTitle: { fontSize: 20, marginBottom: 15, fontWeight: "bold" },
+  modalTitle: {
+    fontSize: 22,
+    marginBottom: 15,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#ddd",
     borderRadius: 8,
     padding: 10,
-    marginBottom: 15,
+    marginBottom: 12,
+    backgroundColor: "#f9f9f9",
   },
   label: { fontWeight: "bold", marginBottom: 5 },
   priorityRow: { flexDirection: "row", marginBottom: 15 },
@@ -229,8 +203,23 @@ const styles = StyleSheet.create({
   btnRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
+    marginTop: 15,
   },
+  cancelBtn: {
+    flex: 1,
+    marginRight: 8,
+    backgroundColor: "#ccc",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  saveBtn: {
+    flex: 1,
+    marginLeft: 8,
+    backgroundColor: "#007BFF",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  btnText: { color: "#fff", fontWeight: "bold" },
 });
-
-

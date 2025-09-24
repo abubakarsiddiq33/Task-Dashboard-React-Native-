@@ -1,33 +1,30 @@
-// Redux/FeatureSlice/userApi.js
-import { apiSlice } from "../FeatureSlice/apiSlice";
+import { apiSlice } from "./apiSlice";
 
 export const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // 🔹 Signup endpoint
     signupUser: builder.mutation({
       query: (userData) => ({
         url: "/auth/signup",
         method: "POST",
         body: userData,
-        headers: {
-          "Content-Type": "application/json",
-        },
       }),
     }),
-
-    // 🔹 Login endpoint
     loginUser: builder.mutation({
       query: (credentials) => ({
         url: "/auth/login",
         method: "POST",
         body: credentials,
-        headers: {
-          "Content-Type": "application/json",
-        },
       }),
+    }),
+    getAllUsers: builder.query({
+      query: () => "/users/find-all",
+      providesTags: ["Users"],
     }),
   }),
 });
 
-// ✅ Export hooks for both
-export const { useSignupUserMutation, useLoginUserMutation } = userApi;
+export const {
+  useSignupUserMutation,
+  useLoginUserMutation,
+  useGetAllUsersQuery,
+} = userApi;

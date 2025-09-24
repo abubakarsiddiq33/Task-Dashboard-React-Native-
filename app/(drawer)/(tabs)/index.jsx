@@ -1,13 +1,62 @@
 import { useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  FlatList,
+} from "react-native";
 import TaskModal from "../../../components/TaskModal";
-import { Provider, useSelector } from "react-redux";
-import store from "../../../Redux/store";
+import { useGetAllTasksQuery } from "../../../Redux/FeatureSlice/tasksApiSlice";
 
 export default function HomeScreen() {
   const [isChecked, setChecked] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
- 
+
+  // 🔹 all tasks fetch
+  const { data: allTasks, isLoading, isError } = useGetAllTasksQuery();
+
+  const renderTask = ({ item }) => (
+    <View style={styles.card}>
+      <TouchableOpacity
+        style={styles.titleRow}
+        onPress={() => setChecked(!isChecked)}
+        activeOpacity={0.7}
+      >
+        {/* Custom checkbox */}
+        <View style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
+          {isChecked && <Text style={styles.checkmark}>✓</Text>}
+        </View>
+
+        <Text style={styles.title}>{item.title}</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.description}>{item.description}</Text>
+
+      {/* Badges Row */}
+      <View style={styles.badgesRow}>
+        <View style={[styles.badge, { backgroundColor: "#ffe4b3" }]}>
+          <Text style={{ color: "#d9822b", fontSize: 10 }}>
+            {item.priority?.toUpperCase()}
+          </Text>
+        </View>
+        <Text style={styles.meta}>
+          {item.completed ? "✅ Completed" : "⏳ Pending"}
+        </Text>
+        <Text style={styles.meta}>⏱️ {item.estimatedHours || 0}h</Text>
+      </View>
+
+      {/* Tags */}
+      <View style={styles.tagsRow}>
+        {item.tags?.map((tag, idx) => (
+          <View style={styles.tag} key={idx}>
+            <Text style={styles.tagText}>{tag}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
 
   return (
     <View style={styles.safeArea}>
@@ -18,50 +67,16 @@ export default function HomeScreen() {
           placeholderTextColor="#888"
         />
 
-        {/* Task Card */}
-        <View style={styles.card}>
-          <TouchableOpacity
-            style={styles.titleRow}
-            onPress={() => setChecked(!isChecked)}
-            activeOpacity={0.7}
-          >
-            {/* Custom checkbox box */}
-            <View style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
-              {isChecked && <Text style={styles.checkmark}>✓</Text>}
-            </View>
+        {isLoading && <Text>Loading...</Text>}
+        {isError && <Text>Error loading tasks</Text>}
 
-            <Text style={styles.title}>
-              Design responsive layout components
-            </Text>
-          </TouchableOpacity>
-
-          {/* Description */}
-          <Text style={styles.description}>
-            Create mobile-first responsive components with Flexbox and CSS Grid
-          </Text>
-
-          {/* Badges Row */}
-          <View style={styles.badgesRow}>
-            <View style={[styles.badge, { backgroundColor: "#ffe4b3" }]}>
-              <Text style={{ color: "#d9822b", fontSize: 10 }}>MEDIUM</Text>
-            </View>
-            <Text style={styles.meta}>✅ Completed</Text>
-            <Text style={styles.meta}>⏱️ 3h spent</Text>
-          </View>
-
-          {/* Tags */}
-          <View style={styles.tagsRow}>
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>css</Text>
-            </View>
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>responsive</Text>
-            </View>
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>ui</Text>
-            </View>
-          </View>
-        </View>
+        {/* All Tasks List */}
+        <FlatList
+          data={allTasks || []}
+          keyExtractor={(item) => item.id?.toString()}
+          renderItem={renderTask}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        />
 
         {/* Floating Plus Button */}
         <TouchableOpacity
@@ -72,7 +87,10 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
         {/* Task Modal */}
-        <TaskModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+        <TaskModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+        />
       </View>
     </View>
   );
@@ -175,21 +193,21 @@ const styles = StyleSheet.create({
 
   // Floating Action Button
   fab: {
-  position: "absolute",
-  bottom: 5, // tab ke upar overlap
-  alignSelf: "center", // center align karega
-  backgroundColor: "#437c8d",
-  width: 60,
-  height: 60,
-  borderRadius: 30,
-  justifyContent: "center",
-  alignItems: "center",
-  elevation: 5,
-  shadowColor: "#000",
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.3,
-  shadowRadius: 3,
-},
+    position: "absolute",
+    bottom: 5, // tab ke upar overlap
+    alignSelf: "center", // center align karega
+    backgroundColor: "#437c8d",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+  },
 
   fabText: {
     color: "#fff",

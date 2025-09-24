@@ -1,14 +1,15 @@
 import { Link, router } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
-  View,
+  Alert,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  Alert,
+  View,
 } from "react-native";
-import { useLoginUserMutation } from "../../Redux/FeatureSlice/userSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useLoginUserMutation } from "../../Redux/FeatureSlice/userApi";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -26,10 +27,14 @@ export default function Login() {
       const result = await loginUser({ email, password }).unwrap();
       console.log("Login Success:", result);
 
-      // agar API token bhejti hai to yahan save kar sakte ho (AsyncStorage/Redux me)
-      // AsyncStorage.setItem("token", result.token);
+      // ✅ Token ko AsyncStorage me save karna
+      if (result?.token) {
+        await AsyncStorage.setItem("token", result.token);
+      }
 
+      // ✅ Drawer par redirect
       router.push("/(drawer)");
+
       Alert.alert("Success", `Welcome ${result?.user?.name || email}!`);
     } catch (err) {
       console.error("Login failed:", err);
