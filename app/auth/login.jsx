@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLoginUserMutation } from "../../Redux/FeatureSlice/userApi";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -18,28 +19,44 @@ export default function Login() {
   const [loginUser, { isLoading, isError, error }] = useLoginUserMutation();
 
   const handleLogin = async () => {
-    if (email === "" || password === "") {
-      Alert.alert("Error", "Please enter email and password");
-      return;
-    }
 
-    try {
-      const result = await loginUser({ email, password }).unwrap();
-      console.log("Login Success:", result);
 
-      // ✅ Token ko AsyncStorage me save karna
-      if (result?.token) {
-        await AsyncStorage.setItem("token", result.token);
-      }
+const auth = getAuth();
+signInWithEmailAndPassword(auth, email, password)
+  .then((userCredential) => {
+    // Signed in 
+    const user = userCredential.user;
+    console.log("User logged in:", user);
+    // ...
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    console.error("Error during login:", errorCode, errorMessage);
+  });
 
-      // ✅ Drawer par redirect
-      router.push("/(drawer)");
+    // if (email === "" || password === "") {
+    //   Alert.alert("Error", "Please enter email and password");
+    //   return;
+    // }
 
-      Alert.alert("Success", `Welcome ${result?.user?.name || email}!`);
-    } catch (err) {
-      console.error("Login failed:", err);
-      Alert.alert("Error", err?.data?.message || "Invalid email or password");
-    }
+    // try {
+    //   const result = await loginUser({ email, password }).unwrap();
+    //   console.log("Login Success:", result);
+
+    //   // ✅ Token ko AsyncStorage me save karna
+    //   if (result?.token) {
+    //     await AsyncStorage.setItem("token", result.token);
+    //   }
+
+    //   // ✅ Drawer par redirect
+    //   router.push("/(drawer)");
+
+    //   Alert.alert("Success", `Welcome ${result?.user?.name || email}!`);
+    // } catch (err) {
+    //   console.error("Login failed:", err);
+    //   Alert.alert("Error", err?.data?.message || "Invalid email or password");
+    // }
   };
 
   return (

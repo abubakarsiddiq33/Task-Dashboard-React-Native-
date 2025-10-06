@@ -9,30 +9,47 @@ import {
   Alert,
 } from "react-native";
 import { useSignupUserMutation } from "../../Redux/FeatureSlice/authSlice";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 export default function Signup() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  
+
   // RTK Query signup hook
-  const [signupUser, { isLoading, isError, error }] = useSignupUserMutation();
+  // const [signupUser, { isLoading, isError, error }] = useSignupUserMutation();
 
   const handleSignup = async () => {
-    try {
-      // backend ko call
-      const result = await signupUser({ username, email, password }).unwrap();
-      console.log("Signed up:", result);
 
-      // success alert
-      Alert.alert("Success", `Account created for ${username}! Please login.`);
-
-      // login page par redirect
+    const auth = getAuth();   
+  createUserWithEmailAndPassword(auth,username, email, password)
+    .then((userCredential) => {
+      // Signed up
+      const user = userCredential.user;
       router.push("/auth/login");
-    } catch (err) {
-      console.error("Signup failed:", err);
-      Alert.alert("Error", err?.data?.message || "Signup failed!");
-    }
+      console.log("User signed up:", user);
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.error("Error during signup:", errorCode, errorMessage);
+    });
+    // try {
+    //   // backend ko call
+    //   const result = await signupUser({ username, email, password }).unwrap();
+    //   console.log("Signed up:", result);
+
+    //   // success alert
+    //   Alert.alert("Success", `Account created for ${username}! Please login.`);
+
+    //   // login page par redirect
+    //   router.push("/auth/login");
+    // } catch (err) {
+    //   console.error("Signup failed:", err);
+    //   Alert.alert("Error", err?.data?.message || "Signup failed!");
+    // }
   };
 
   return (
@@ -65,18 +82,18 @@ export default function Signup() {
       <TouchableOpacity
         style={styles.button}
         onPress={handleSignup}
-        disabled={isLoading}
+        // disabled={isLoading}
       >
-        <Text style={styles.buttonText}>
+        {/* <Text style={styles.buttonText}>
           {isLoading ? "Signing up..." : "Sign Up"}
-        </Text>
+        </Text> */}
       </TouchableOpacity>
 
-      {isError && (
+      {/* {isError && (
         <Text style={{ color: "red", marginTop: 10 }}>
           {error?.data?.message || "Something went wrong"}
         </Text>
-      )}
+      )} */}
 
       <Text style={styles.loginText}>
         Already have an account?{" "}
