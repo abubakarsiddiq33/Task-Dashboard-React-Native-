@@ -1,17 +1,19 @@
-import { configureStore } from "@reduxjs/toolkit";
-import { apiSlice } from "./FeatureSlice/apiSlice";
-import authReducer from "./FeatureSlice/authSlice";
+import { configureStore } from '@reduxjs/toolkit';
+import authReducer from './FeatureSlice/authSlice';
+import taskReducer from './FeatureSlice/taskSlice';
 
 export const store = configureStore({
   reducer: {
-    // RTK Query reducer
-    [apiSlice.reducerPath]: apiSlice.reducer,
-    // Auth reducer
+    // Yahan saare slices add kiye jaate hain
     auth: authReducer,
+    tasks: taskReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // kabhi kabhi non-serializable values ka warning hata dega
-    }).concat(apiSlice.middleware),
-  // devTools: process.env.NODE_ENV !== "production", // devtools only in dev mode
+      serializableCheck: {
+        // Ignore Firebase Timestamp serialization warnings
+        ignoredActions: ["tasks/createTask/fulfilled", "tasks/fetchTasks/fulfilled"],
+        ignoredPaths: ["tasks.tasks.createdAt", "tasks.tasks.updatedAt"],
+      },
+    }),
 });

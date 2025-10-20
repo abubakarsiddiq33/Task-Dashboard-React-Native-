@@ -32,11 +32,11 @@ export default function TabLayout() {
 
   
         <Tabs.Screen
-          name="chats"
+          name="profile"
           options={{
-            title: "Chat",
+            title: "Profile",
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="chatbox" size={size} color={color} />
+              <Ionicons name="person" size={size} color={color} />
             ),
           }}
         />

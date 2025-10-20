@@ -1,81 +1,207 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  FlatList,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  FlatList,
+  RefreshControl,
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import TaskModal from "../../../components/TaskModal";
-import { useGetAllTasksQuery } from "../../../Redux/FeatureSlice/tasksApiSlice";
+import { auth } from "../../../Firebase";
+import {
+  fetchTasks,
+  toggleTaskCompletion,
+  setSearchQuery,
+  selectFilteredTasks,
+  selectIsLoading,
+} from "../../../Redux/FeatureSlice/taskSlice";
 
 export default function HomeScreen() {
-  const [isChecked, setChecked] = useState(false);
+  const dispatch = useDispatch();
   const [modalVisible, setModalVisible] = useState(false);
 
-  // 🔹 all tasks fetch
-  const { data: allTasks, isLoading, isError } = useGetAllTasksQuery();
+  const tasks = useSelector(selectFilteredTasks);
+  const isLoading = useSelector(selectIsLoading);
+  const searchQuery = useSelector((state) => state.tasks.searchQuery);
+
+  // Load tasks when component mounts
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      async function fetchMyTasks() {
+        const user = auth.currentUser;
+        const q = query(collection(db, "tasks"), where("uid", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      }
+      dispatch(fetchTasks(user.uid));
+    }
+  }, [dispatch]);
+
+  // Refresh tasks
+  const handleRefresh = () => {
+    const user = auth.currentUser;
+    if (user) {
+      dispatch(fetchTasks(user.uid));
+    }
+  };
+
+  // Handle modal close
+  const handleModalClose = () => {
+    setModalVisible(false);
+  };
+
+  // Handle search
+  const handleSearch = (text) => {
+    dispatch(setSearchQuery(text));
+  };
+
+  // Handle checkbox toggle
+  const handleToggleComplete = (taskId, completed) => {
+    dispatch(toggleTaskCompletion({ taskId, completed }));
+  };
 
   const renderTask = ({ item }) => (
     <View style={styles.card}>
       <TouchableOpacity
         style={styles.titleRow}
-        onPress={() => setChecked(!isChecked)}
+        onPress={() => handleToggleComplete(item.id, item.completed)}
         activeOpacity={0.7}
       >
         {/* Custom checkbox */}
-        <View style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
-          {isChecked && <Text style={styles.checkmark}>✓</Text>}
+        <View
+          style={[styles.checkbox, item.completed && styles.checkboxChecked]}
+        >
+          {item.completed && <Text style={styles.checkmark}>✓</Text>}
         </View>
 
-        <Text style={styles.title}>{item.title}</Text>
+        <Text style={[styles.title, item.completed && styles.completedTitle]}>
+          {item.title}
+        </Text>
       </TouchableOpacity>
 
-      <Text style={styles.description}>{item.description}</Text>
+      <Text
+        style={[
+          styles.description,
+          item.completed && styles.completedDescription,
+        ]}
+      >
+        {item.description}
+      </Text>
 
       {/* Badges Row */}
       <View style={styles.badgesRow}>
-        <View style={[styles.badge, { backgroundColor: "#ffe4b3" }]}>
-          <Text style={{ color: "#d9822b", fontSize: 10 }}>
+        <View
+          style={[
+            styles.badge,
+            {
+              backgroundColor:
+                item.priority === "High"
+                  ? "#ffebee"
+                  : item.priority === "Medium"
+                  ? "#fff3e0"
+                  : "#e8f5e8",
+            },
+          ]}
+        >
+          <Text
+            style={{
+              color:
+                item.priority === "High"
+                  ? "#d32f2f"
+                  : item.priority === "Medium"
+                  ? "#f57c00"
+                  : "#388e3c",
+              fontSize: 10,
+              fontWeight: "600",
+            }}
+          >
             {item.priority?.toUpperCase()}
           </Text>
         </View>
-        <Text style={styles.meta}>
-          {item.completed ? "✅ Completed" : "⏳ Pending"}
-        </Text>
-        <Text style={styles.meta}>⏱️ {item.estimatedHours || 0}h</Text>
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>
+            {item.completed ? "✅ Done" : "⏳ Pending"}
+          </Text>
+        </View>
+        {item.estimatedHours > 0 && (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>⏱️ {item.estimatedHours}h</Text>
+          </View>
+        )}
       </View>
 
+      {/* Category */}
+      {/* {item.category && (
+        <View style={styles.categoryContainer}>
+          <Text style={styles.categoryText}>📁 {item.category}</Text>
+        </View>
+      )} */}
+
       {/* Tags */}
-      <View style={styles.tagsRow}>
-        {item.tags?.map((tag, idx) => (
-          <View style={styles.tag} key={idx}>
-            <Text style={styles.tagText}>{tag}</Text>
-          </View>
-        ))}
-      </View>
+      {item.tags && item.tags.length > 0 && (
+        <View style={styles.tagsRow}>
+          {item.tags.map((tag, idx) => (
+            <View style={styles.tag} key={idx}>
+              <Text style={styles.tagText}>{tag}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* Due Date */}
+      {item.dueDate && (
+        <Text style={styles.dueDate}>📅 Due: {item.dueDate}</Text>
+      )}
     </View>
   );
 
   return (
     <View style={styles.safeArea}>
       <View style={styles.container}>
+        {/* Search Bar */}
         <TextInput
-          placeholder="Search..."
+          placeholder="Search tasks..."
           style={styles.searchBar}
           placeholderTextColor="#888"
+          value={searchQuery}
+          onChangeText={handleSearch}
         />
 
-        {isLoading && <Text>Loading...</Text>}
-        {isError && <Text>Error loading tasks</Text>}
+        {/* Loading and Error States */}
+        {isLoading && tasks.length === 0 && (
+          <View style={styles.centerContainer}>
+            <Text style={styles.loadingText}>Loading tasks...</Text>
+          </View>
+        )}
 
-        {/* All Tasks List */}
+        {!isLoading && tasks.length === 0 && (
+          <View style={styles.centerContainer}>
+            <Text style={styles.emptyText}>
+              {searchQuery
+                ? "No tasks found matching your search"
+                : "No tasks yet. Create your first task!"}
+            </Text>
+          </View>
+        )}
+
+        {/* Tasks List */}
         <FlatList
-          data={allTasks || []}
-          keyExtractor={(item) => item.id?.toString()}
+          data={tasks}
+          keyExtractor={(item) => item.id}
           renderItem={renderTask}
-          contentContainerStyle={{ paddingBottom: 100 }}
+          contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoading}
+              onRefresh={handleRefresh}
+              colors={["#437c8d"]}
+            />
+          }
+          showsVerticalScrollIndicator={false}
         />
 
         {/* Floating Plus Button */}
@@ -87,10 +213,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
         {/* Task Modal */}
-        <TaskModal
-          visible={modalVisible}
-          onClose={() => setModalVisible(false)}
-        />
+        <TaskModal visible={modalVisible} onClose={handleModalClose} />
       </View>
     </View>
   );
@@ -106,39 +229,44 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   searchBar: {
-    height: 45,
-    borderColor: "#ccc",
+    height: 48,
+    borderColor: "#ddd",
     borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 12,
+    borderRadius: 12,
+    paddingHorizontal: 16,
     marginBottom: 16,
     backgroundColor: "#fff",
+    fontSize: 15,
+  },
+  listContent: {
+    paddingBottom: 100,
+    gap: 12,
   },
   card: {
     borderRadius: 12,
     padding: 16,
     backgroundColor: "#fff",
-    elevation: 3,
+    elevation: 2,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 3,
+    marginBottom: 4,
   },
   titleRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 6,
-    gap: 8,
+    marginBottom: 8,
   },
   checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    borderWidth: 1,
+    width: 22,
+    height: 22,
+    borderRadius: 5,
+    borderWidth: 2,
     borderColor: "#999",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 8,
+    marginRight: 12,
   },
   checkboxChecked: {
     backgroundColor: "#437c8d",
@@ -146,56 +274,94 @@ const styles = StyleSheet.create({
   },
   checkmark: {
     color: "#fff",
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "bold",
   },
   title: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 17,
+    fontWeight: "600",
     color: "#333",
+    flex: 1,
   },
   description: {
-    fontSize: 13,
+    fontSize: 14,
     color: "#666",
     marginBottom: 12,
+    lineHeight: 20,
   },
   badgesRow: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderRadius: 6,
+    backgroundColor: "#f0f0f0",
   },
-  meta: {
+  badgeText: {
     fontSize: 12,
-    color: "#444",
-    marginRight: 10,
+    color: "#555",
+    fontWeight: "500",
+  },
+  categoryContainer: {
+    marginBottom: 8,
+  },
+  categoryText: {
+    fontSize: 13,
+    color: "#666",
   },
   tagsRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: 6,
+    marginBottom: 8,
   },
   tag: {
-    backgroundColor: "#eef2f7",
-    paddingHorizontal: 8,
+    backgroundColor: "#e3f2fd",
+    paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 6,
+    borderRadius: 12,
   },
   tagText: {
     fontSize: 12,
-    color: "#555",
+    color: "#1976d2",
+    fontWeight: "500",
   },
-
-  // Floating Action Button
+  dueDate: {
+    fontSize: 13,
+    color: "#666",
+    marginTop: 4,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 100,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: "#666",
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#999",
+    textAlign: "center",
+    paddingHorizontal: 40,
+  },
+  completedTitle: {
+    textDecorationLine: "line-through",
+    opacity: 0.5,
+  },
+  completedDescription: {
+    opacity: 0.5,
+  },
   fab: {
     position: "absolute",
-    bottom: 5, // tab ke upar overlap
-    alignSelf: "center", // center align karega
+    bottom: 20,
+    right: 20,
     backgroundColor: "#437c8d",
     width: 60,
     height: 60,
@@ -204,14 +370,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     elevation: 5,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.3,
-    shadowRadius: 3,
+    shadowRadius: 4,
   },
-
   fabText: {
     color: "#fff",
-    fontSize: 28,
-    fontWeight: "bold",
+    fontSize: 32,
+    fontWeight: "300",
   },
 });

@@ -1,15 +1,50 @@
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Drawer } from "expo-router/drawer";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import {
   DrawerContentScrollView,
   DrawerItemList,
 } from "@react-navigation/drawer";
-import { router } from "expo-router";
-
-const userName = "John Doe";
+import { Drawer } from "expo-router/drawer";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useDispatch } from "react-redux";
+import { logoutUser } from '../../Redux/FeatureSlice/authSlice';
 
 export default function DrawerLayout() {
+  const dispatch = useDispatch()
+
+  const handleLogout = async () => {
+    try {
+      // Show confirmation dialog
+      Alert.alert(
+        "Logout",
+        "Are you sure you want to logout?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel"
+          },
+          {
+            text: "Logout",
+            style: "destructive",
+            onPress: async () => {
+              try {
+                console.log("Logout button clicked - starting logout...");
+                const result = await dispatch(logoutUser()).unwrap();
+                console.log("Logout successful, result:", result);
+                console.log("Redux state should update automatically");
+                // Redux state change will automatically redirect to login
+              } catch (error) {
+                console.error("Logout error:", error);
+                Alert.alert("Error", "Failed to logout. Please try again.");
+              }
+            }
+          }
+        ]
+      );
+    } catch (error) {
+      console.error("Logout error:", error);
+      Alert.alert("Error", "Failed to logout. Please try again.");
+    }
+  };
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Drawer
@@ -35,19 +70,7 @@ export default function DrawerLayout() {
             >
               <DrawerItemList {...props} />
             </DrawerContentScrollView>
-            {/* Logout Button at Bottom */}
-            <View style={styles.logoutContainer}>
-              <TouchableOpacity
-                style={styles.logoutBtn}
-                onPress={() => {
-                  router.replace("/auth/login");
-                }}
-              >
-                <Text style={{ color: "#fff", fontWeight: "bold" }}>
-                  Logout
-                </Text>
-              </TouchableOpacity>
-            </View>
+         
           </View>
         )}
       >
@@ -58,13 +81,7 @@ export default function DrawerLayout() {
             drawerLabel: "Dashboard",
           }}
         />
-        <Drawer.Screen
-          name="today"
-          options={{
-            title: "Today",
-            drawerLabel: "Today",
-          }}
-        />
+       
         <Drawer.Screen
           name="pending"
           options={{
@@ -84,18 +101,3 @@ export default function DrawerLayout() {
   );
 }
 
-const styles = StyleSheet.create({
-  logoutContainer: {
-    padding: 20,
-    borderColor: "#e0e0e0",
-    marginBottom: 30,
-  },
-  logoutBtn: {
-    backgroundColor: "#437c8d",
-    paddingHorizontal: 50,
-    paddingVertical: 10,
-    borderRadius: 25,
-    alignSelf: "center",
-    elevation: 2,
-  },
-});

@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getAuth } from "firebase/auth";
+import { getAuth,FacebookAuthProvider  } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCVc6llo21YwdeHImbMR0G4g_CxPl6HmW0",
@@ -13,6 +13,12 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-// const analytics = getAnalytics(app);
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
+
+// For development - you can remove this in production
+// connectFirestoreEmulator(db, 'localhost', 8080);
+
+export { app, auth, db };
+
