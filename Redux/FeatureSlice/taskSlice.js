@@ -54,8 +54,8 @@ export const createTask = createAsyncThunk(
         ...taskData,
         ownerUid: userId,
         completed: false,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+        // createdAt: serverTimestamp(),
+        // updatedAt: serverTimestamp(),
       };
 
       const docRef = await addDoc(collection(db, "tasks"), newTask);
@@ -63,8 +63,8 @@ export const createTask = createAsyncThunk(
       return {
         id: docRef.id,
         ...newTask,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        // createdAt: new Date().toISOString(),
+        // updatedAt: new Date().toISOString(),
       };
     } catch (error) {
       console.error("Error creating task:", error);
@@ -81,7 +81,7 @@ export const updateTask = createAsyncThunk(
       const taskRef = doc(db, "tasks", taskId);
       await updateDoc(taskRef, {
         ...updates,
-        updatedAt: serverTimestamp(),
+        // updatedAt: serverTimestamp(),
       });
 
       return { taskId, updates };
@@ -100,7 +100,7 @@ export const toggleTaskCompletion = createAsyncThunk(
       const taskRef = doc(db, "tasks", taskId);
       await updateDoc(taskRef, {
         completed: !completed,
-        updatedAt: serverTimestamp(),
+        // updatedAt: serverTimestamp(),
       });
 
       return { taskId, completed: !completed };
@@ -218,7 +218,8 @@ export const selectCompletedTasks = (state) => {
   return state.tasks.tasks.filter((task) => task.completed === true);
 };
 export const selectPendingTasks = (state) => {
-  return state.tasks.tasks.filter((task) => task.completed !== true);
+ return state.tasks.tasks.filter((task) => task.completed === false);
+
 };
 
 export const selectFilteredTasks = (state) => {

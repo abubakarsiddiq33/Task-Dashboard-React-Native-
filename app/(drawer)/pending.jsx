@@ -4,15 +4,15 @@ import { FlatList, StyleSheet, Text, View, TouchableOpacity } from "react-native
 import { selectPendingTask } from "../../Redux/FeatureSlice/taskSlice";
 
 export default function PendingTask() {
-  const pendingTask = useSelector(selectPendingTask);
+  // const pendingTask = useSelector();
 
-  if (pendingTask.length === 0) {
-    return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.emptyText}>No completed tasks found.</Text>
-      </View>
-    );
-  }
+  // if (pendingTask.length === 0) {
+  //   return (
+  //     <View style={styles.centerContainer}>
+  //       <Text style={styles.emptyText}>No Pending tasks found.</Text>
+  //     </View>
+  //   );
+  // }
 
   const renderTask = ({ item }) => (
     <View style={styles.card}>
@@ -87,7 +87,7 @@ export default function PendingTask() {
     <View style={styles.safeArea}>
       <View style={styles.container}>
         <FlatList
-          data={pendingTask}
+          // data={pendingTask}
           keyExtractor={(item) => item.id}
           renderItem={renderTask}
           contentContainerStyle={styles.listContent}

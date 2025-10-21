@@ -3,7 +3,7 @@ import {
   DrawerItemList,
 } from "@react-navigation/drawer";
 import { Drawer } from "expo-router/drawer";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useDispatch } from "react-redux";
 import { logoutUser } from '../../Redux/FeatureSlice/authSlice';

@@ -1,11 +1,11 @@
 // app/_layout.js
 import { Stack } from "expo-router";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useEffect } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { Provider, useDispatch, useSelector } from "react-redux";
+import { clearUser, setLoading, setUser } from "../Redux/FeatureSlice/authSlice";
 import { store } from "../Redux/store";
-import { useEffect } from "react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { setUser, clearUser, setLoading } from "../Redux/FeatureSlice/authSlice";
 
 function AppContent() {
   const dispatch = useDispatch();

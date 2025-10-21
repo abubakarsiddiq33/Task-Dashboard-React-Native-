@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "984924834055",
+    "project_id": "task-dashboard-424dc",
+    "storage_bucket": "task-dashboard-424dc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:984924834055:android:933c954446939a915a9da2",
+        "android_client_info": {
+          "package_name": "android.task.dashboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "984924834055-o2mbd5r5t7aqhr27gme2h074hn2f8eft.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAba6Ugr5YOxeDBlR1tyAyjS28PS1YXKFQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "984924834055-42csv4tlji10jsv8shgo8o0o3e13ff1n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

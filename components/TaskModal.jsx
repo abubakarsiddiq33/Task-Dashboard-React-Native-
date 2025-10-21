@@ -41,7 +41,7 @@ export default function TaskModal({ visible, onClose }) {
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("Medium");
   const [category, setCategory] = useState("General");
-  const [dueDate, setDueDate] = useState("");
+  // const [dueDate, setDueDate] = useState(newDate());
   const [estimatedHours, setEstimatedHours] = useState("");
   const [tagsInput, setTagsInput] = useState("");
 
@@ -63,7 +63,7 @@ export default function TaskModal({ visible, onClose }) {
         description,
         priority,
         category,
-        dueDate,
+        // dueDate,
         estimatedHours: estimatedHours ? parseInt(estimatedHours) : 0,
         tags: tagsInput ? tagsInput.split(",").map((tag) => tag.trim()) : [],
       };
@@ -85,7 +85,7 @@ export default function TaskModal({ visible, onClose }) {
     setDescription("");
     setPriority("Medium");
     setCategory("General");
-    setDueDate("");
+    // setDueDate("");
     setEstimatedHours("");
     setTagsInput("");
   };
@@ -171,14 +171,14 @@ export default function TaskModal({ visible, onClose }) {
                     returnKeyType="next"
                   />
 
-                  <TextInput
+                  {/* <TextInput
                     style={styles.input}
                     placeholder="Due Date (e.g. 2025-12-31)"
                     placeholderTextColor="#999"
                     value={dueDate}
                     onChangeText={setDueDate}
                     returnKeyType="next"
-                  />
+                  /> */}
 
                   <TextInput
                     style={styles.input}

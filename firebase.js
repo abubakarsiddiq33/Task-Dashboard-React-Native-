@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth,FacebookAuthProvider  } from "firebase/auth";
+import { getAuth  } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -18,7 +18,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // For development - you can remove this in production
-// connectFirestoreEmulator(db, 'localhost', 8080);
+// connectFirestoreEmulator(db, 'localhost', 8080);00000000000000000000
 
 export { app, auth, db };
 

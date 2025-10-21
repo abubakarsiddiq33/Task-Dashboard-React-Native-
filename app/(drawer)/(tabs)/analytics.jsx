@@ -1,3 +1,4 @@
+import { use, useEffect } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -6,8 +7,16 @@ import {
   View,
 } from "react-native";
 import * as Progress from "react-native-progress";
+import { useSelector } from "react-redux";
 
 export default function Analytics  () {
+
+  const allTasks = useSelector((state) => state.tasks.tasks);
+const completedTasks = allTasks.filter(task => task.completed);
+const totalTasks = allTasks.length;
+const completionRate = totalTasks === 0 ? 0 : (completedTasks.length / totalTasks).toFixed(2);
+  
+
   return (
     <>
 
@@ -15,7 +24,7 @@ export default function Analytics  () {
         <ScrollView contentContainerStyle={styles.container}>
  <Text style={styles.header}>Analytics</Text>
           <View style={styles.card}>
-            <Text style={styles.cardNum}>0</Text>
+            <Text style={styles.cardNum}>{allTasks.length}</Text>
             <Text style={styles.cardLabel}>Total Tasks</Text>
             <View style={styles.cardInnerBox}>
               <Text style={styles.cardInnerText}>Weekly Progress</Text>
